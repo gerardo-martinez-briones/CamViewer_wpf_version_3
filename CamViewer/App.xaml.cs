@@ -1,17 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
+﻿using CamViewer.Views;
+using System;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace CamViewer
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : Application
     {
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+            Main main;
+            Config config;
+            string[] args = Environment.GetCommandLineArgs();
+
+            if (args.Length == 1)
+            {
+                main = new Main();
+
+                main.Show();
+            }
+            else if (args.Any(x => x.ToLower().Equals("--config")))
+            {
+                config = new Config();
+
+                config.Show();
+            }
+        }
     }
 }

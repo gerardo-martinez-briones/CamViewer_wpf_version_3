@@ -12,11 +12,12 @@ namespace CamViewer.Views
 {
     public partial class Config : Window
     {
-        // ********************* variables *********************
-        private List<Folder> _folders = new List<Folder>();
+        // ********************* variables *********************        
+        private TreeViewItem _viewItemOnvif;
+        private TreeViewItem _viewItemSettings;
 
-        TreeViewItem _viewItemOnvif;
-        TreeViewItem _viewItemSettings;
+        public List<Folder> _folders = new List<Folder>();
+        public string _idSelected = string.Empty;
 
         public enum TypeNodeEnum
         {
@@ -33,7 +34,7 @@ namespace CamViewer.Views
             ChildHeaderProfiles = 10,
             ChildProfiles = 11,
             ChildHeaderCameras = 12,
-            ChildCamera = 12
+            ChildCamera = 13
         }
 
         // ********************* constructors *********************
@@ -49,40 +50,23 @@ namespace CamViewer.Views
 
             try
             {
-                tvwMainConfig.IsEnabled = false;
                 actionName = ((MenuItem)sender).Tag.ToString();
 
                 switch (actionName)
                 {
                     case "[NEW_FOLDER]":
-                        ctlContainer.Content = new FolderManager(this);
+                        ctlContainer.Content = new FolderControl(this);
+                        break;
+                    case "[LIVE_VIDEO]":
+                        ctlContainer.Content = new LiveVideoControl(this);
                         break;
                     default:
-                        tvwMainConfig.IsEnabled = true;
                         break;
                 }
             }
             catch (Exception ex)
             {
                 Log4Cam.ErrorManager(ex);
-            }
-        }
-
-        private void OnViewItem_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            TreeViewItem viewItem;
-
-            try
-            {
-                viewItem = (TreeViewItem)sender;
-            }
-            catch (Exception ex)
-            {
-                Log4Cam.ErrorManager(ex);
-            }
-            finally
-            {
-                viewItem = null;
             }
         }
 
@@ -124,6 +108,15 @@ namespace CamViewer.Views
             }
         }
 
+        private void TvwMainConfig_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            TreeView x = (TreeView)sender;
+
+            TreeViewItem y = (TreeViewItem)x.SelectedItem;
+
+            _idSelected = y.Uid;
+        }
+
         // ********************* methods *********************
         private void InitializeTreeView()
         {
@@ -156,13 +149,14 @@ namespace CamViewer.Views
             _folders[0].Devices[0].Profiles.Add(new Profile("User Profile06"));
             _folders[0].Devices[0].Profiles.Add(new Profile("User Profile07"));
             _folders[0].Devices[0].Profiles.Add(new Profile("User Profile08"));
-            _folders[0].Devices[0].Cameras.Add(new CameraInfo("rtsp://169.254.195.178:554/live?pf=11&pt=tcp"));
-            _folders[0].Devices[0].Cameras.Add(new CameraInfo("rtsp://169.254.195.178:554/live?pf=17&pt=tcp"));
+            _folders[0].Devices[0].Cameras.Add(new CameraInfo("rtsp://root:Pass123!@169.254.195.178:554/live?pf=11&pt=tcp"));
+            _folders[0].Devices[0].Cameras.Add(new CameraInfo("rtsp://root:Pass123!@169.254.195.178:554/live?pf=17&pt=tcp"));
 
             _folders.Add(new Folder("Spreader"));
             _folders[1].Devices.Add(new Device("root", "Pass123!", "169.254.113.207"));
             _folders[1].Devices[0].Profiles.Add(new Profile("profile_1 h264"));
             _folders[1].Devices[0].Profiles.Add(new Profile("profile_1 jpeg"));
+            _folders[1].Devices[0].Cameras.Add(new CameraInfo("rtsp://root:Pass123!@169.254.113.207/onvif-media/media.amp?profile=profile_1_h264&sessiontimeout=60&streamtype=unicast"));        
 
             _folders.Add(new Folder("Trolley PTZ"));
 
@@ -234,7 +228,6 @@ namespace CamViewer.Views
                 result.Uid = id;
                 result.Tag = type;
                 result.ContextMenu = BuildContextMenu(type);
-                result.MouseRightButtonDown += OnViewItem_MouseRightButtonDown;
             }
             catch (Exception ex)
             {
@@ -288,14 +281,11 @@ namespace CamViewer.Views
             {
                 result = new ContextMenu();
 
-            //ChildFolder = 2,
-            //ChildDevice = 3,
-            //ChildInfo = 4,
-            //ChildInfoName = 5,
-            //ChildInfoManufacturer = 6,
-            //ChildInfoFirmware = 7,
-            //ChildInfoOnvifVersion = 8,
-            //ChildInfoUri = 9,
+            // = 5,
+            // = 6,
+            // = 7,
+            // = 8,
+            // = 9,
             //ChildHeaderProfiles = 10,
             //ChildProfiles = 11,
             //ChildHeaderCameras = 12,
@@ -314,6 +304,27 @@ namespace CamViewer.Views
                         break;
                     case TypeNodeEnum.ChildDevice:
                         result.Items.Add(BuildMenuItem("Get Data", "[GET_DATA]"));
+                        break;
+                    case TypeNodeEnum.ChildInfo:
+                        break;
+                    case TypeNodeEnum.ChildInfoName:
+                        break;
+                    case TypeNodeEnum.ChildInfoManufacturer:
+                        break;
+                    case TypeNodeEnum.ChildInfoFirmware:
+                        break;
+                    case TypeNodeEnum.ChildInfoOnvifVersion:
+                        break;
+                    case TypeNodeEnum.ChildInfoUri:
+                        break;
+                    case TypeNodeEnum.ChildHeaderProfiles:
+                        break;
+                    case TypeNodeEnum.ChildProfiles:
+                        break;
+                    case TypeNodeEnum.ChildHeaderCameras:
+                        break;
+                    case TypeNodeEnum.ChildCamera:
+                        result.Items.Add(BuildMenuItem("Live Video", "[LIVE_VIDEO]"));
                         break;
                     default:
                         break;
@@ -351,7 +362,8 @@ namespace CamViewer.Views
         {
             try
             {
-                //TreeViewItem viewItemFolder = BuildViewItem(TypeNodeEnum.ChildFolder, folder.Name, (Image)App.Current.FindResource("ImgFolder"));
+                _folders.Add(folder);
+                LoadConfiguration();
             }
             catch (Exception ex)
             {

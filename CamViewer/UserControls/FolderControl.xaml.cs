@@ -7,11 +7,11 @@ using System.Windows.Controls;
 
 namespace CamViewer.UserControls
 {
-    public partial class FolderManager : UserControl
+    public partial class FolderControl : UserControl
     {
         private Config _config;
 
-        public FolderManager(Config config)
+        public FolderControl(Config config)
         {
             InitializeComponent();
             _config = config;
@@ -31,6 +31,7 @@ namespace CamViewer.UserControls
                 currentFolder = new Folder(txtName.Text.Trim());
 
                 _config.AddFolder(currentFolder);
+                BtnClose_Click(sender, e);
             }
             catch (Exception ex)
             {

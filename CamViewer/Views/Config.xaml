@@ -31,6 +31,7 @@
 
             <TreeView x:Name="tvwMainConfig" Grid.Row="1" Grid.Column="0"
                       SelectedItemChanged="TvwMainConfig_SelectedItemChanged"
+                      ContextMenuOpening="TvwMainConfig_ContextMenuOpening"
                       HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 
             <ContentControl x:Name="ctlContainer" Grid.Row="1" Grid.Column="1" Margin="10"

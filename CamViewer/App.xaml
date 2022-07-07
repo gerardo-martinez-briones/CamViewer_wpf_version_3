@@ -4,38 +4,59 @@
              xmlns:clr="clr-namespace:System;assembly=mscorlib"
              Startup="Application_Startup">
     <Application.Resources>
-        <clr:String x:Key="StrGeneralError">An error occurred. Please check the Application Log</clr:String>
+        <clr:String x:Key="StrGeneralError">An error occurred. Please review the Application Log</clr:String>
         <clr:String x:Key="StrCloseApplicationQuestion">Are you sure to Exit?</clr:String>
 
-        <Image x:Key="ImgOnvif" Source="/Resources/Images/Onvif.png" Width="16" Height="16" />
-        <Image x:Key="ImgSettings" Source="/Resources/Images/Settings.png" Width="16" Height="16" />
-        <Image x:Key="ImgFolder" Source="/Resources/Images/Folder.png" Width="16" Height="16" />
-        <Image x:Key="ImgDevice" Source="/Resources/Images/Device.png" Width="16" Height="16" />
-        <Image x:Key="ImgInfo" Source="/Resources/Images/Info.png" Width="16" Height="16" />
-        <Image x:Key="ImgProfiles" Source="/Resources/Images/Profiles.png" Width="16" Height="16" />
-        <Image x:Key="ImgCameras" Source="/Resources/Images/Cameras.png" Width="16" Height="16" />
-
-        <BitmapImage x:Key="ImgClose" UriSource="/Resources/Images/Close.png" />
+        <clr:String x:Key="StrRootNodeCaption">GLOBAL SETTINGS</clr:String>
+        <clr:String x:Key="StrOnvifNodeCaption">ONVIF DEVICES</clr:String>
+        <clr:String x:Key="StrSettingsNodeCaption">SETTINGS</clr:String>
+        <clr:String x:Key="StrInfoHeaderNodeCaption">INFORMATION</clr:String>
+        <clr:String x:Key="StrInfoNameNodeCaption">NAME = </clr:String>
+        <clr:String x:Key="StrInfoManufacturerNodeCaption">MANUFACTURER = </clr:String>
+        <clr:String x:Key="StrInfoFirmwareNodeCaption">FIRMWARE = </clr:String>
+        <clr:String x:Key="StrInfoOnvifVersionNodeCaption">VERSION = </clr:String>
+        <clr:String x:Key="StrInfoUriNodeCaption">URI = </clr:String>
+        <clr:String x:Key="StrProfileHeaderNodeCaption">PROFILES</clr:String>
+        <clr:String x:Key="StrCameraHeaderNodeCaption">CAMERAS</clr:String>
+        <clr:String x:Key="StrParametersNodeCaption">PARAMETERS</clr:String>
+        <clr:String x:Key="StrSettingsPathNodeCaption">SettingsPath = </clr:String>
+        <clr:String x:Key="StrPrefixCraneNameNodeCaption">PrefixCraneName =</clr:String>
+        <clr:String x:Key="StrCraneNameTemplateNodeCaption">CraneNameTemplate =</clr:String>
+        <clr:String x:Key="StrBlockNameTemplateNodeCaption">BlockNameTemplate =</clr:String>
+        <clr:String x:Key="StrProjectNodeCaption">Project =</clr:String>
+        <clr:String x:Key="StrRosIDNodeCaption">RosID =</clr:String>
+        <clr:String x:Key="StrROSIniPathNodeCaption">ROSIniPath =</clr:String>
+        
+        <Image x:Key="ImgRootNode" Source="/Resources/Images/GlobalSettings.png" Width="16" Height="16" />
+        <Image x:Key="ImgOnvifNode" Source="/Resources/Images/Onvif.png" Width="16" Height="16" />
+        <Image x:Key="ImgSettingsNode" Source="/Resources/Images/Settings.png" Width="16" Height="16" />
+        <Image x:Key="ImgXmlFileNode" Source="/Resources/Images/File.png" Width="16" Height="16" />
+        <Image x:Key="ImgParametersNode" Source="/Resources/Images/Parameters.png" Width="16" Height="16" />
+        <Image x:Key="ImgFolderNode" Source="/Resources/Images/Folder.png" Width="16" Height="16" />
+        <Image x:Key="ImgDeviceNode" Source="/Resources/Images/Device.png" Width="16" Height="16" />
+        <Image x:Key="ImgInfoNode" Source="/Resources/Images/Info.png" Width="16" Height="16" />
+        <Image x:Key="ImgProfileNode" Source="/Resources/Images/Profile.png" Width="16" Height="16" />
+        <Image x:Key="ImgProfileTokenNode" Source="/Resources/Images/ProfileItem.png" Width="16" Height="16" />
+        <Image x:Key="ImgCameraNode" Source="/Resources/Images/Camera.png" Width="16" Height="16" />
+        <Image x:Key="ImgCameraItemNode" Source="/Resources/Images/CameraItem.png" Width="16" Height="16" />
+        <Image x:Key="ImgButtonClose" Source="/Resources/Images/Close.png" Width="16" Height="16" />
 
         <Style TargetType="{x:Type Control}">
             <Setter Property="FontFamily" Value="pack://application:,,,/Resources/Fonts/#Roboto Medium"/>
         </Style>
-
         <Style TargetType="{x:Type TreeView}">
-            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontSize" Value="14" />
             <Setter Property="FontWeight" Value="Regular" />
-            <Setter Property="Margin" Value="5, 5" />
+            <Setter Property="Margin" Value="5,5" />
             <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="VerticalAlignment" Value="Stretch" />
         </Style>
-
         <Style TargetType="{x:Type MenuItem}">
             <Setter Property="FontSize" Value="14" />
-            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="FontWeight" Value="Regular" />
             <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="VerticalAlignment" Value="Stretch" />
         </Style>
-
         <Style x:Key="Title_Screen" TargetType="{ x:Type TextBlock }">
             <Setter Property="FontWeight" Value="Medium" />
             <Setter Property="FontSize" Value="16" />
@@ -44,14 +65,12 @@
             <Setter Property="Padding" Value="5" />
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
-
         <Style x:Key="Title_User_Control" TargetType="{ x:Type TextBlock }">
             <Setter Property="FontWeight" Value="Medium" />
             <Setter Property="FontSize" Value="20" />
             <Setter Property="Foreground" Value="Black" />
             <Setter Property="VerticalAlignment" Value="Top" />
         </Style>
-
         <Style x:Key="Title_Grid_Control" TargetType="{ x:Type DataGridColumnHeader }">
             <Setter Property="FontWeight" Value="Medium" />
             <Setter Property="FontSize" Value="14" />
@@ -60,20 +79,17 @@
             <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="VerticalAlignment" Value="Stretch" />
         </Style>
-
         <Style x:Key="Field_Label_Form" TargetType="{ x:Type TextBlock }">
             <Setter Property="FontWeight" Value="Medium" />
             <Setter Property="FontSize" Value="14" />
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="HorizontalAlignment" Value="Center" />
         </Style>
-
         <Style x:Key="Field_Textbox_Form" TargetType="{ x:Type TextBox }">
             <Setter Property="FontWeight" Value="Regular" />
             <Setter Property="FontSize" Value="14" />
             <Setter Property="Padding" Value="5" />
         </Style>
-
         <Style x:Key="Field_Passwordbox_Form" TargetType="{ x:Type PasswordBox }">
             <Setter Property="Height" Value="auto" />
             <Setter Property="FontWeight" Value="Regular" />
@@ -82,14 +98,12 @@
             <Setter Property="Padding" Value="10" />
             <Setter Property="HorizontalAlignment" Value="Left" />
         </Style>
-
         <Style x:Key="Button_Form" TargetType="{x:Type Button}">
             <Setter Property="Width" Value="100"/>
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="Margin" Value="8,5"/>
             <Setter Property="Padding" Value="5"/>
         </Style>
-
         <Style x:Key="Button_Close_Form" TargetType="{ x:Type Button }">
             <Setter Property="ToolBar.ToolTip" Value="Close" />
             <Setter Property="Width" Value="20" />
@@ -114,6 +128,42 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+        </Style>
+        <Style x:Key="Image_Node" TargetType="Image">
+            <Style.Triggers>
+                <DataTrigger Value="0" Binding="{Binding Type}">
+                    <Setter Property="Source" Value="{StaticResource ImgRootNode}" />
+                </DataTrigger>
+                <DataTrigger Value="1" Binding="{Binding Type}">
+                    <Setter Property="Source" Value="{StaticResource ImgOnvifNode}" />
+                </DataTrigger>
+                <DataTrigger Value="2" Binding="{Binding Type}">
+                    <Setter Property="Source" Value="{StaticResource ImgSettingsNode}" />
+                </DataTrigger>
+                <DataTrigger Value="3" Binding="{Binding Type}">
+                    <Setter Property="Source" Value="{StaticResource ImgFolderNode}" />
+                </DataTrigger>
+                <DataTrigger Value="4" Binding="{Binding Type}">
+                    <Setter Property="Source" Value="{StaticResource ImgDeviceNode}" />
+                </DataTrigger>
+                <DataTrigger Value="5" Binding="{Binding Type}">
+                    <Setter Property="Source" Value="{StaticResource ImgInfoNode}" />
+                </DataTrigger>
+                <DataTrigger Value="11" Binding="{Binding Type}">
+                    <Setter Property="Source" Value="{StaticResource ImgProfileNode}" />
+                </DataTrigger>
+                <DataTrigger Value="12" Binding="{Binding Type}">
+                    <Setter Property="Source" Value="{StaticResource ImgProfileTokenNode}" />
+                </DataTrigger>
+                <DataTrigger Value="13" Binding="{Binding Type}">
+                    <Setter Property="Source" Value="{StaticResource ImgCameraNode}" />
+                </DataTrigger>
+                <DataTrigger Value="14" Binding="{Binding Type}">
+                    <Setter Property="Source" Value="{StaticResource ImgCameraItemNode}" />
+                </DataTrigger>
+            </Style.Triggers>
+            <Setter Property="Width" Value="16" />
+            <Setter Property="Height" Value="16" />
         </Style>
     </Application.Resources>
 </Application>

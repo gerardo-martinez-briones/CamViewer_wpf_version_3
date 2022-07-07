@@ -9,32 +9,32 @@ namespace CamViewer.UserControls
 
     public partial class LiveVideoControl : UserControl
     {
-        private AxVLCPlugin2 _vlcMediaPlayer = new AxVLCPlugin2();
-        private static Config _config;
+        //private AxVLCPlugin2 _vlcMediaPlayer = new AxVLCPlugin2();
+        //private static Config _config;
 
-        public LiveVideoControl(Config config)
-        {
-            InitializeComponent();
+        //public LiveVideoControl(Config config)
+        //{
+        //    InitializeComponent();
 
-            _config = config;
+        //    _config = config;
 
-            wfhContainer.Child = _vlcMediaPlayer;
+        //    wfhContainer.Child = _vlcMediaPlayer;
 
 
-        }
+        //}
 
-        private string GetMediaUrl()
-        {
-            return (_config._folders
-            .SelectMany(a => a.Devices)
-            .SelectMany(b => b.Cameras).FirstOrDefault(c => c.Id.Equals(_config._idSelected))).MediaUrl;
-        }
+        //private string GetMediaUrl()
+        //{
+        //    return (_config._folders
+        //    .SelectMany(a => a.Devices)
+        //    .SelectMany(b => b.Cameras).FirstOrDefault(c => c.Id.Equals(_config._idSelected))).MediaUrl;
+        //}
 
-        private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
-        {
-            _vlcMediaPlayer.Toolbar = false;
-            _vlcMediaPlayer.playlist.add(GetMediaUrl());
-            _vlcMediaPlayer.playlist.play();
-        }
+        //private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        //{
+        //    _vlcMediaPlayer.Toolbar = false;
+        //    _vlcMediaPlayer.playlist.add(GetMediaUrl());
+        //    _vlcMediaPlayer.playlist.play();
+        //}
     }
 }

@@ -3,8 +3,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d"
-             Loaded="UserControl_Loaded">
+             mc:Ignorable="d">
+    <!--Loaded="UserControl_Loaded">-->
     <Grid Width="580" Height="auto">
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
@@ -19,7 +19,7 @@
 
         <TextBlock Grid.Row="0" Grid.Column="0" Text="Folder Manager" Style="{StaticResource Title_User_Control}" />
 
-        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
+        <!--<StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
             <TextBlock  Text="Name" Width="50" Style="{StaticResource Field_Label_Form}" />
             <TextBox x:Name="txtName" Width="200" Text="{Binding CurrentFolder.Name}" Style="{StaticResource Field_Textbox_Form}" />
         </StackPanel>
@@ -29,6 +29,6 @@
 
             <Button x:Name="btnSave" Content="Save" Style="{StaticResource Button_Form}" Click="BtnSave_Click" />
             <Button x:Name="btnClose" Content="Close" Style="{StaticResource Button_Form}" Click="BtnClose_Click" />
-        </StackPanel>
+        </StackPanel>-->
     </Grid>
 </UserControl>

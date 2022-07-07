@@ -1,46 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using static CamViewer.Helpers.General;
 
 namespace CamViewer.Models
 {
     public class Folder
     {
-        private string _id = string.Empty;
-        private string _name = string.Empty;
-        private List<Device> _devices;
+        public int Type { get; set; } = (int)NodeTypeEnum.FOLDER_NODE;
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public List<Device> Devices { get; set; } = new List<Device>();
 
         public Folder(string name)
         {
-            _id = Guid.NewGuid().ToString();
-            _name = name;
-
-            _devices = new List<Device>();
+            Id = Guid.NewGuid().ToString();
+            Name = name;
+            Devices = new List<Device>();
         }
-
         public Folder(string id, string name)
         {
-            _id = id;
-            _name = name;
-
-            _devices = new List<Device>();
-        }
-
-        public string Id
-        {
-            get => _id;
-            set => _id = value;
-        }
-
-        public string Name
-        {
-            get => _name;
-            set => _name = value;
-        }
-
-        public List<Device> Devices
-        {
-            get => _devices;
-            set => _devices = value;
+            Id = id;
+            Name = name;
+            Devices = new List<Device>();
         }
     }
 }

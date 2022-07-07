@@ -1,0 +1,280 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Settings>
+  <!--The Tag accept 2 types of the values:
+  1. FileName. Example: AnotherFileName.xml
+  2. FullPathFile. Example: C:\WhereverFolder\AnotherFileName.xml
+  If this Tag is filled the rest of the file is ignored because
+  the application "jumps" towards the other file.-->
+  <SettingsPath></SettingsPath>
+  <!--Allows defining the fixed part of the Name of the crane to be removed
+  to obtain the block number if necessary.-->
+  <PrefixCraneName>ASC</PrefixCraneName>
+  <!--Allows defining the list of cranes that will appear available to use Argument -RCMS
+  the Prefix and Subfix of the name are defined, the character "-" is indicative of
+  the dynamic value to generate the correct name of the crane. For example: ASC01W, ASC01L.-->
+  <CraneNameTemplate>ASC-L,ASC-W</CraneNameTemplate>
+  <!--Allows you to define the prefix of the blocks, normally the value will remain the same as "BLK-".
+  The character "-" acts as a variable value that is modified based on the user's selection.
+  For example: BLK01, BLK02.-->
+  <BlockNameTemplate>BLK-</BlockNameTemplate>
+  <!--Contains the Cimplicity Project Name that will be used to read each point used by the application.-->
+  <Project>YARDDIR</Project>
+  <!--Allows to establish the ROS Number. When a value is set the following ROSIniPath tag is ignored.-->
+  <RosID></RosID>
+  <!--Allows setting the path of the Cms2000.ini file in order to read the ROSID value. If the RosID tag
+  contains a value, no action is taken with this path.-->
+  <ROSIniPath>C:\Windows\cms2000.ini</ROSIniPath>
+  <!--IMPORTANT: The Blocks section is ONLY required if the site contains LANES, otherwise this whole section
+  can be removed from the file.  
+  The Numbers attribute allows you to place block numbers separated by commas individually or using a range
+  notation separated by a "-" character.  
+  The Lanes section MUST contain at least the definition of Position "1" each position equals the position of the Chassis.
+  If a Lane can receive 2 Chassis it is possible to define it in this section.    
+  Types and CameraNumbers is a comma-separated text string that MUST be corresponding (same number of elements).
+  If a position MUST NOT have a camera you can set that value to 0.-->
+  <Blocks>
+    <Block Numbers="77-90">
+      <Lanes>
+        <Lane ID="1">
+          <Positions>
+            <Position ID="1" Types="6,7" CameraNumbers="1,1" />
+          </Positions>
+        </Lane>
+        <Lane ID="2">
+          <Positions>
+            <Position ID="1" Types="6,7" CameraNumbers="2,2" />
+          </Positions>
+        </Lane>
+        <Lane ID="3">
+          <Positions>
+            <Position ID="1" Types="6,7" CameraNumbers="3,3" />
+          </Positions>
+        </Lane>
+        <Lane ID="4">
+          <Positions>
+            <Position ID="1" Types="6,7" CameraNumbers="4,4" />
+          </Positions>
+        </Lane>
+        <Lane ID="5">
+          <Positions>
+            <Position ID="1" Types="6,7" CameraNumbers="5,5" />
+          </Positions>
+        </Lane>
+      </Lanes>
+    </Block>
+  </Blocks>
+  <!--This section correspond to the access credentials for each camera used on the site.  
+  UIMode allows to establish the MODE of execution of the Axis Cameras. 
+	none - the AMC user interface is in standard mode.
+	ptz-absolute - the AMC user interface accepts Pan, Tilt, Zoom commands in absolute mode
+	ptz-relative - the AMC user interface accepts Pan, Tilt, Zoom commands in relative mode and displays a cross hair in the center of the image.
+	ptz-relative-no-cross - the AMC user interface accepts Pan, Tilt, Zoom commands in relative mode and displays NO cross hair in the center of the image.
+	ptz-user-setting - the AMC user interface accepts Pan, Tilt, Zoom commands and is either in absolute or relative mode depending on user settings.
+	digital-zoom - Use mouse wheel and mouse click to perform digital zoom in the video.
+	dewarped-view - Use mouse wheel and mouse click to perform PTZ operations in the digital dewarped view.
+	MDConfig - the AMC user interface includes motion detection configuration.
+	PTZMap - same as ptz-user-setting but AMC also shows a mini map window.-->
+  <Credentials>
+    <UserName>root</UserName>
+    <Password>Pass123</Password>
+    <UIMode>ptz-absolute</UIMode>
+  </Credentials>
+  <!--This section contains all the configuration definitions for the Camera Types.  
+  The ID Attribute allows to identify each Type of Camera therefore it must be unique and numerical.
+  DynamicName. Define the Name of the Camera (HostFile). Use the character "-" like a dynamic part of the name, will be replace by BlockNumber Or Part of the CraneName.
+  MediaUrl. Define the Dynamic URL for the Camera. Use the character "*" to replace for the DynamicName and "#" for the CameraNumber define into the Lanes.
+  PTZControlUrl. Is used to establish the URL that allows modifying the camera position using the position PRESETS (HOME, RESET, etc ...).
+  IDPreset. Indicates the ID Reference about which PRESETS are available for the camera.
+  BlockFlag. is of type BOOL. It indicates to the system if from the name of the Crane only the Number is obtained or also its suffix.
+  DescriptionText. Contains the general description of the camera.-->
+  <CameraTypes>
+    <CameraType ID="1">
+      <DynamicName>ASC-VSPR</DynamicName>
+      <MediaUrl>axrtsp://*/axis-media/media.amp?camera=quad</MediaUrl>
+      <PTZControlUrl></PTZControlUrl>
+      <IDPreset>0</IDPreset>
+      <BlockFlag>false</BlockFlag>
+      <DescriptionText>Spreader</DescriptionText>
+    </CameraType>
+    <CameraType ID="2">
+      <DynamicName>ASC-PTZ</DynamicName>
+      <MediaUrl>axrtsp://*/axis-media/media.amp</MediaUrl>
+      <PTZControlUrl>http://*/axis-cgi/com/ptz.cgi</PTZControlUrl>
+      <IDPreset>1</IDPreset>
+      <BlockFlag>false</BlockFlag>
+      <DescriptionText>Trolley PTZ</DescriptionText>
+    </CameraType>
+    <CameraType ID="3">
+      <DynamicName>BLK-WPTZ</DynamicName>
+      <MediaUrl>axrtsp://*/axis-media/media.amp</MediaUrl>
+      <PTZControlUrl>http://*/axis-cgi/com/ptz.cgi</PTZControlUrl>
+      <IDPreset>3</IDPreset>
+      <BlockFlag>true</BlockFlag>
+      <DescriptionText>Waterside PTZ</DescriptionText>
+    </CameraType>
+    <CameraType ID="4">
+      <DynamicName>BLK-LPTZ1</DynamicName>
+      <MediaUrl>axrtsp://*/axis-media/media.amp</MediaUrl>
+      <PTZControlUrl>http://*/axis-cgi/com/ptz.cgi</PTZControlUrl>
+      <IDPreset>2</IDPreset>
+      <BlockFlag>true</BlockFlag>
+      <DescriptionText>Landside PTZ</DescriptionText>
+    </CameraType>
+    <CameraType ID="5">
+      <DynamicName>BLK-LPTZ2</DynamicName>
+      <MediaUrl>axrtsp://*/axis-media/media.amp</MediaUrl>
+      <PTZControlUrl>http://*/axis-cgi/com/ptz.cgi</PTZControlUrl>
+      <IDPreset>2</IDPreset>
+      <BlockFlag>true</BlockFlag>
+      <DescriptionText>Landside PTZ</DescriptionText>
+    </CameraType>
+    <CameraType ID="6">
+      <DynamicName>BLK-VLANE</DynamicName>
+      <MediaUrl>axrtsp://*#/axis-media/media.amp</MediaUrl>
+      <PTZControlUrl>http://*#/axis-cgi/com/ptz.cgi</PTZControlUrl>
+      <IDPreset>2</IDPreset>
+      <BlockFlag>true</BlockFlag>
+      <DescriptionText>Lanes</DescriptionText>
+    </CameraType>
+    <CameraType ID="7">
+      <DynamicName>BLK-VBTH</DynamicName>
+      <MediaUrl>axrtsp://*/axis-media/media.amp</MediaUrl>
+      <PTZControlUrl>http://*/axis-cgi/com/ptz.cgi</PTZControlUrl>
+      <IDPreset>2</IDPreset>
+      <BlockFlag>true</BlockFlag>
+      <DescriptionText>Lanes</DescriptionText>
+    </CameraType>
+    <CameraType ID="8">
+      <DynamicName>ASC-CRPTZ</DynamicName>
+      <MediaUrl>axrtsp://*/axis-media/media.amp</MediaUrl>
+      <PTZControlUrl>http://*/axis-cgi/com/ptz.cgi</PTZControlUrl>
+      <IDPreset>1</IDPreset>
+      <BlockFlag>false</BlockFlag>
+      <DescriptionText>CBL PTZ</DescriptionText>
+    </CameraType>
+  </CameraTypes>
+  <!--This section contains all the configuration definitions for the Presets.  
+  The ID Attribute allows to identify each Preset therefore it must be unique and numerical.
+  The Names Attribute corresponds to a series of Names defined internally in EACH camera which
+  refer to a specific position. Presets MUST be individually defined in each Camera.-->
+  <Presets>
+    <Preset ID="1" Names="Reset,Home,Zone,Driver,Spreader" />
+    <Preset ID="2" Names="Reset,Home" />
+    <Preset ID="3" Names="Reset,Home,Zone" />
+  </Presets>
+  <!--This section is the one that allows defining the Cimplicity points to be read.
+  IMPORTANT: This section only works for ROS Mode. In RCMS Mode this functionality is ignored.
+  The Property "RosCraneActive" It is mandatory to use this property, it corresponds to the point of Cimplicity
+  that contains the Crane Name, without this point correctly defined in Cimplicity the application
+  will NOT be able to work correctly.
+  The Properties "PositionChassis" and "TargetLaneNumber" are optionals. They MUST only be included if the site
+  contains LANES (dynamic cameras) and in this file they have the BLOCKS section defined. The "PositionChassis"
+  Property could be defined only for specific blocks, for the rest it will take the default value 1.
+  The Properties "Position02" and "Position03" are optionals. It depends on how many views (Setups) are defined in
+  the Forms section.
+  IMPORTANT: Each "DynamicPointName" contains a character "*" that will contain the value corresponding to
+  the name of each crane. Only "RosCraneActive" will replace the character "*" with the corresponding RosID.-->
+  <CimplicityPoints>
+    <CimPoint PropertyName="RosCraneActive" DynamicPointName="*_CrnVw" />    
+    <CimPoint PropertyName="TargetLaneNumber" DynamicPointName="*_LsTrgLaneNum" />
+    <CimPoint PropertyName="Position02" DynamicPointName="*_LsTrgLaneNum NE 0" />
+  </CimplicityPoints>
+  <!--This section is the one that allows defining the Forms that will be displayed by the application.
+  The ID Attribute allows to identify each Form therefore it must be unique and numerical.
+  Location. Allow defining in which position (x,y) the form should be displayed.
+  Dimension. Allow defining in which size (width, height) the form should be set.
+  the Cimplcity point values.
+  ShowPanel. Allows to establish if the lower panel (PRESETS and MANUAL CHANGE) can be displayed in the form.
+  Border. allows you to set the BORDER for the form, having the possibility of placing a Title Bar so
+  that you can move the form with the mouse.
+  BorderCamera. Allows you to set the BORDER for the camera.
+  Interval. Indicate what is the rate to refresh the values of Cimplicity. The Default value is 100.
+  OnTop. Indicate if the Form will ALWAYS be displayed above any other windows window. The default value is false.
+  Exit. Indicates if the form had the BORDER with a Title Bar, the Close Button could be selected.
+  BtnEnb. Indicates if the buttons are enabled to be used MANUALLY by the operators. With this they could block
+  them and only view the cameras indicated by the PLC through the Cimplicity points (referring to the position).
+  PresetEnb. Indicates if the buttons will be displayed to be used and change the position of the selected camera.
+  SetPresEnb. Indicates if the checkbox will be displayed to enable the functionality of establishing a new position
+  for each Preset.
+  LaneDisplayType. How LANES values will be displayed if using Numbers or Letters.
+  AutoHome. Indicates whether, when loading the Layout with the cameras,they by default move to their HOME position.
+  Setups. The ID Attribute allows to identify each Setup therefore it must be unique and numerical.
+  Cameras. The ID Attribute allows to identify each Camera therefore it must be unique and numerical.
+  Camera IDType. indicates the ID of the CAMERA. The attribute IDType is used if the camera is NOT DYNAMIC or
+  IS NOT A LANE CAMERA when you have the exact data of which camera to show only the ID of the CameraType (ID) is established.
+  Camera IndexLane. is EXCLUSIVE of IDType means that by using it we are defining that the camera is DYNAMIC and that its
+  value will be obtained based on the LANE ID received from Cimplicity.-->
+  <Forms>
+    <FormSetup ID="1">
+      <!--<Location X="1920" Y="0" />
+      <Dimension Width="1920" Height="1000" />-->
+      <Location X="0" Y="0" />
+      <Dimension Width="500" Height="500" />
+      <ShowPanel>false</ShowPanel>
+      <Border>1</Border>
+      <BorderCamera>2</BorderCamera>
+      <Interval>100</Interval>
+      <!--<OnTop>true</OnTop>-->
+      <OnTop>false</OnTop>
+      <Exit>false</Exit>
+      <BtnEnb>false</BtnEnb>
+      <PresetEnb>true</PresetEnb>
+      <SetPresEnb>false</SetPresEnb>
+      <LaneDisplayType>false</LaneDisplayType>
+      <AutoHome>false</AutoHome>      
+      <Setups>
+        <Setup ID="1">
+          <Button Text="Spreader" Visible="true" />
+          <Cameras>
+            <Camera ID="1" IDType="1" />
+          </Cameras>
+        </Setup>
+      </Setups>
+    </FormSetup>
+    <FormSetup ID="2">
+      <!--<Location X="3840" Y="0" />
+      <Dimension Width="1920" Height="1080" />-->
+      <Location X="505" Y="0" />
+      <Dimension Width="900" Height="700" />
+      <ShowPanel>true</ShowPanel>
+      <Border>1</Border>
+      <BorderCamera>2</BorderCamera>
+      <Interval>100</Interval>
+      <OnTop>false</OnTop>
+      <Exit>false</Exit>
+      <BtnEnb>true</BtnEnb>
+      <PresetEnb>true</PresetEnb>
+      <SetPresEnb>false</SetPresEnb>
+      <LaneDisplayType>false</LaneDisplayType>
+      <AutoHome>false</AutoHome>
+      <Setups>
+        <Setup ID="1">
+          <Button Text="Trolley" Visible="true" />
+          <Cameras>
+            <Camera ID="1" IDType="2" />
+          </Cameras>
+        </Setup>
+        <Setup ID="2">
+          <Button Text="Landside" Visible="true" />
+          <Cameras>
+            <Camera ID="1" IndexLane="0" />
+            <Camera ID="2" IndexLane="1" />
+            <Camera ID="3" IDType="2" />
+            <Camera ID="4" IDType="8" />
+          </Cameras>
+        </Setup>
+      </Setups>
+    </FormSetup>
+  </Forms>
+  <!--These properties "Location" And "Dimension" allows defining in which position and size the form should be displayed.
+  If both Properties have value 0, the Form displayed maximized.-->
+  <FormRemote ID="1">
+    <Location X="0" Y="0" />
+    <Dimension Width="0" Height="0" />
+    <Border>2</Border>
+    <BorderCamera>2</BorderCamera>
+    <OnTop>false</OnTop>
+    <Exit>true</Exit>
+    <LaneDisplayType>false</LaneDisplayType>
+  </FormRemote>
+</Settings>

@@ -1,34 +1,23 @@
 ﻿using System;
+using static CamViewer.Helpers.General;
 
 namespace CamViewer.Models
 {
     public class Profile
     {
-        private string _id = string.Empty;
-        private string _token = string.Empty;
+        public int Type { get; set; } = (int)NodeTypeEnum.PROFILE_TOKEN_NODE;
+        public string Id { get; set; } = string.Empty;
+        public string Token { get; set; } = string.Empty;
 
         public Profile(string token)
         {
-            _id = Guid.NewGuid().ToString();
-            _token = token;
+            Id = Guid.NewGuid().ToString();
+            Token = token;
         }
-
         public Profile(string id, string token)
         {
-            _id = id;
-            _token = token;
-        }
-
-        public string Id
-        {
-            get => _id;
-            set => _id = value;
-        }
-
-        public string Token
-        {
-            get => _token;
-            set => _token = value;
+            Id = id;
+            Token = token;
         }
     }
 }

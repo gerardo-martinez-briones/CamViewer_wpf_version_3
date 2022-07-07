@@ -55,7 +55,7 @@ namespace CamViewer.Views
                 switch (actionName)
                 {
                     case "[NEW_FOLDER]":
-                        ctlContainer.Content = new FolderControl(this);
+                        //ctlContainer.Content = new FolderControl(this);
                         break;
                     case "[LIVE_VIDEO]":
                         ctlContainer.Content = new LiveVideoControl(this);
@@ -122,6 +122,11 @@ namespace CamViewer.Views
         {
             try
             {
+                //tvwMainConfig.Items.Clear();
+
+                _viewItemOnvif = new TreeViewItem();
+                _viewItemSettings = new TreeViewItem();
+
                 _viewItemOnvif = BuildViewItem(TypeNodeEnum.ParentOnvif, "0", "Onvif Devices", (Image)App.Current.FindResource("ImgOnvif"));
                 _viewItemSettings = BuildViewItem(TypeNodeEnum.ParentSettings, "1", "Settings", (Image)App.Current.FindResource("ImgSettings"));
 
@@ -137,33 +142,35 @@ namespace CamViewer.Views
         private void LoadConfiguration()
         {
             // ********* test code *********
+            if (_folders.Count == 0)
+            {
+                // load data....
+                _folders.Add(new Folder("Fence"));
+                _folders[0].Devices.Add(new Device("root", "Pass123!", "169.254.195.178"));
+                _folders[0].Devices[0].Profiles.Add(new Profile("User Profile01"));
+                _folders[0].Devices[0].Profiles.Add(new Profile("User Profile02"));
+                _folders[0].Devices[0].Profiles.Add(new Profile("User Profile03"));
+                _folders[0].Devices[0].Profiles.Add(new Profile("User Profile04"));
+                _folders[0].Devices[0].Profiles.Add(new Profile("User Profile05"));
+                _folders[0].Devices[0].Profiles.Add(new Profile("User Profile06"));
+                _folders[0].Devices[0].Profiles.Add(new Profile("User Profile07"));
+                _folders[0].Devices[0].Profiles.Add(new Profile("User Profile08"));
+                _folders[0].Devices[0].Cameras.Add(new Camera("rtsp://root:Pass123!@169.254.195.178:554/live?pf=11&pt=tcp"));
+                _folders[0].Devices[0].Cameras.Add(new Camera("rtsp://root:Pass123!@169.254.195.178:554/live?pf=17&pt=tcp"));
 
-            // load data....
-            _folders.Add(new Folder("Fence"));
-            _folders[0].Devices.Add(new Device("root", "Pass123!", "169.254.195.178"));
-            _folders[0].Devices[0].Profiles.Add(new Profile("User Profile01"));
-            _folders[0].Devices[0].Profiles.Add(new Profile("User Profile02"));
-            _folders[0].Devices[0].Profiles.Add(new Profile("User Profile03"));
-            _folders[0].Devices[0].Profiles.Add(new Profile("User Profile04"));
-            _folders[0].Devices[0].Profiles.Add(new Profile("User Profile05"));
-            _folders[0].Devices[0].Profiles.Add(new Profile("User Profile06"));
-            _folders[0].Devices[0].Profiles.Add(new Profile("User Profile07"));
-            _folders[0].Devices[0].Profiles.Add(new Profile("User Profile08"));
-            _folders[0].Devices[0].Cameras.Add(new CameraInfo("rtsp://root:Pass123!@169.254.195.178:554/live?pf=11&pt=tcp"));
-            _folders[0].Devices[0].Cameras.Add(new CameraInfo("rtsp://root:Pass123!@169.254.195.178:554/live?pf=17&pt=tcp"));
+                _folders.Add(new Folder("Spreader"));
+                _folders[1].Devices.Add(new Device("root", "Pass123!", "169.254.113.207"));
+                _folders[1].Devices[0].Profiles.Add(new Profile("profile_1 h264"));
+                _folders[1].Devices[0].Profiles.Add(new Profile("profile_1 jpeg"));
+                _folders[1].Devices[0].Cameras.Add(new Camera("rtsp://root:Pass123!@169.254.113.207/onvif-media/media.amp?profile=profile_1_h264&sessiontimeout=60&streamtype=unicast"));
 
-            _folders.Add(new Folder("Spreader"));
-            _folders[1].Devices.Add(new Device("root", "Pass123!", "169.254.113.207"));
-            _folders[1].Devices[0].Profiles.Add(new Profile("profile_1 h264"));
-            _folders[1].Devices[0].Profiles.Add(new Profile("profile_1 jpeg"));
-            _folders[1].Devices[0].Cameras.Add(new CameraInfo("rtsp://root:Pass123!@169.254.113.207/onvif-media/media.amp?profile=profile_1_h264&sessiontimeout=60&streamtype=unicast"));        
-
-            _folders.Add(new Folder("Trolley PTZ"));
+                _folders.Add(new Folder("Trolley PTZ"));
+            }
 
             // ********* test code *********
+            //InitializeTreeView();
 
-            _viewItemOnvif.Items.Clear();
-            _viewItemSettings.Items.Clear();
+
 
             foreach (Folder folderItem in _folders)
             {
@@ -191,7 +198,7 @@ namespace CamViewer.Views
 
                     TreeViewItem viewCamerasHeaderItem = BuildViewItem(TypeNodeEnum.ChildHeaderCameras, deviceItem.Id, "Cameras", (Image)App.Current.FindResource("ImgCameras"));
 
-                    foreach (CameraInfo cameraInfoItem in deviceItem.Cameras)
+                    foreach (Camera cameraInfoItem in deviceItem.Cameras)
                     {
                         TreeViewItem viewCameraInfoItem = BuildViewItem(TypeNodeEnum.ChildCamera, cameraInfoItem.Id, cameraInfoItem.MediaUrl);
 
@@ -369,6 +376,14 @@ namespace CamViewer.Views
             {
                 throw ex;
             }
+        }
+
+        private void TvwMainConfig_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            TreeView view = (TreeView)sender;
+
+            if (view.SelectedItem == null)
+                e.Handled = true;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using CamViewer.Views;
+﻿using CamViewer.Helpers;
+using CamViewer.Views;
 using System;
 using System.Linq;
 using System.Windows;
@@ -10,20 +11,30 @@ namespace CamViewer
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             Main main;
-            Config config;
-            string[] args = Environment.GetCommandLineArgs();
+            ConfigView configView;
 
-            if (args.Length == 1)
+            try
             {
-                main = new Main();
+                Log4Cam.Add.Info("CamViewer is Starting.");
 
-                main.Show();
+                string[] args = Environment.GetCommandLineArgs();
+
+                if (args.Length == 1)
+                {
+                    main = new Main();
+
+                    main.Show();
+                }
+                else if (args.Any(x => x.ToLower().Equals("--config")))
+                {
+                    configView = new ConfigView();
+
+                    configView.Show();
+                }
             }
-            else if (args.Any(x => x.ToLower().Equals("--config")))
+            catch (Exception ex)
             {
-                config = new Config();
-
-                config.Show();
+                throw ex;
             }
         }
     }

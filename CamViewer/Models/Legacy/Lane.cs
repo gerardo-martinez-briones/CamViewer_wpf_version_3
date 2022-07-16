@@ -5,8 +5,16 @@ namespace CamViewer.Models.Legacy
 {
     public class Lane
     {
+        public Lane()
+        {
+            IDLane = 0;
+
+            Positions = new List<Position>();
+        }
+
         [XmlAttribute("ID")]
-        public int IDLane { get; set; } = 0;
-        public List<Position> Positions { get; set; } = new List<Position>();
+        public int IDLane { get; set; }
+
+        public List<Position> Positions { get; set; }
     }
 }

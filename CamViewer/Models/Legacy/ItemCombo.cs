@@ -2,7 +2,13 @@
 {
     public class ItemCombo
     {
-        public string Text { get; set; } = string.Empty;
-        public string Value { get; set; } = string.Empty;
+        public ItemCombo()
+        {
+            Text = string.Empty;
+            Value = string.Empty;
+        }
+
+        public string Text { get; set; }
+        public string Value { get; set; }
     }
 }

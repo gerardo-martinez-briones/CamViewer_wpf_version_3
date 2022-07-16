@@ -46,7 +46,7 @@ namespace CamViewer.UserControls
         //private void BtnClose_Click(object sender, RoutedEventArgs e)
         //{
         //    _config.ctlContainer.Content = null;
-        //    _config.tvwMainConfig.IsEnabled = true;
+        //    _config.TvwMainConfig.IsEnabled = true;
         //}
     }
 }

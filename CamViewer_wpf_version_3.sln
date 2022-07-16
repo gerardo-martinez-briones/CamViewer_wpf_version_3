@@ -4,6 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.28307.1972
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CamViewer", "CamViewer\CamViewer.csproj", "{54298BA9-567E-4740-9E9C-F3C3E9F61070}"
+	ProjectSection(ProjectDependencies) = postProject
+		{49CD07E9-3C2F-46D7-8A41-07D888BD0E19} = {49CD07E9-3C2F-46D7-8A41-07D888BD0E19}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CtrlOnvifCamera", "OnvifCamera\CtrlOnvifCamera.csproj", "{49CD07E9-3C2F-46D7-8A41-07D888BD0E19}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +20,10 @@ Global
 		{54298BA9-567E-4740-9E9C-F3C3E9F61070}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54298BA9-567E-4740-9E9C-F3C3E9F61070}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54298BA9-567E-4740-9E9C-F3C3E9F61070}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49CD07E9-3C2F-46D7-8A41-07D888BD0E19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49CD07E9-3C2F-46D7-8A41-07D888BD0E19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49CD07E9-3C2F-46D7-8A41-07D888BD0E19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49CD07E9-3C2F-46D7-8A41-07D888BD0E19}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

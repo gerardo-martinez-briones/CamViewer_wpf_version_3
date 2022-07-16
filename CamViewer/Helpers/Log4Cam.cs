@@ -10,21 +10,35 @@ namespace CamViewer.Helpers
     {
         public static readonly Logger Add = LogManager.GetCurrentClassLogger();
 
-        public static void ErrorManager(Exception ex)
+        public static void ErrorManager(Exception ObjEx)
         {
             try
             {
-                string generalError = App.Current.FindResource("StrGeneralError").ToString()
+                string GeneralError = App.Current.FindResource("GeneralError").ToString()
                     + Environment.NewLine
                     + Environment.NewLine
-                    + ex.Message;
+                    + ObjEx.Message;
 
-                string productNameAndVersion = Process.GetCurrentProcess().ProcessName + " "
+                string StrProductNameAndVersion = Process.GetCurrentProcess().ProcessName + " "
                     + Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-                Add.Error(ex);
+                Add.Error(ObjEx);
 
-                MessageBox.Show(generalError, productNameAndVersion, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(GeneralError, StrProductNameAndVersion, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (Exception) { }
+        }
+
+        public static void ErrorManager(string StrErrorMessage)
+        {
+            try
+            {
+                string StrProductNameAndVersion = Process.GetCurrentProcess().ProcessName + " "
+                    + Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
+                Add.Debug(StrErrorMessage);
+
+                MessageBox.Show(StrErrorMessage, StrProductNameAndVersion, MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception) { }
         }

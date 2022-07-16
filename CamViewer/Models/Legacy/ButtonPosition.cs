@@ -4,9 +4,15 @@ namespace CamViewer.Models.Legacy
 {
     public class ButtonPosition
     {
+        public ButtonPosition()
+        {
+            Text = string.Empty;
+            Visible = false;
+        }
+
         [XmlAttribute("Text")]
-        public string Text { get; set; } = string.Empty;
+        public string Text { get; set; }
         [XmlAttribute("Visible")]
-        public bool Visible { get; set; } = false;
+        public bool Visible { get; set; }
     }
 }

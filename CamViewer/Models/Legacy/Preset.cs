@@ -5,10 +5,19 @@ namespace CamViewer.Models.Legacy
 {
     public class Preset
     {
+        public Preset()
+        {
+            IDPreset = 0;
+            Names = string.Empty;
+
+            InternalNames = new List<string>();
+        }
+
         [XmlAttribute("ID")]
-        public int IDPreset { get; set; } = 0;
+        public int IDPreset { get; set; }
         [XmlAttribute("Names")]
-        public string Names { get; set; } = string.Empty;
-        public List<string> InternalNames { get; set; } = new List<string>();
+        public string Names { get; set; }
+
+        public List<string> InternalNames { get; set; }
     }
 }

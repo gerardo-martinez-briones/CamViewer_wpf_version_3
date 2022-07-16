@@ -3,25 +3,28 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" Title="Configuration Manager"
-        Height="700" Width="1100" WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
-        Loaded="Window_Loaded">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="400" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+        mc:Ignorable="d" Title="{StaticResource TitleScreen}"
+        Height="700" Width="1100"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized">
+    <Border BorderBrush="Black" BorderThickness="1">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="400" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-        <TreeView x:Name="tvwMainConfig"
-                  Grid.Row="1" Grid.Column="0"
-                  SelectedItemChanged="TvwMainConfig_SelectedItemChanged"
-                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+            <TreeView x:Name="TvwMainConfig"
+                      Grid.Row="1" Grid.Column="0"
+                      ContextMenuOpening="TvwMainConfig_ContextMenuOpening"
+                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 
-        <ContentControl x:Name="ctlContainer"
-                        Grid.Row="1" Grid.Column="1" Margin="10"
-                        VerticalAlignment="Stretch" />
-    </Grid>
+            <ContentControl x:Name="CtlContainer"
+                            Grid.Row="1" Grid.Column="1" Margin="10"
+                            VerticalAlignment="Stretch" />
+        </Grid>
+    </Border>
 </Window>

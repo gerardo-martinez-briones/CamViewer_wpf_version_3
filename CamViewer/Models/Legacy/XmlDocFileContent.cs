@@ -2,8 +2,15 @@
 {
     public class XmlDocFileContent
     {
-        public int IDCamera { get; set; } = 0;
-        public string MediaUrl_T { get; set; } = string.Empty;
-        public string MediaUrl_F { get; set; } = string.Empty;
+        public XmlDocFileContent()
+        {
+            IDCamera = 0;
+            MediaUrl_T = string.Empty;
+            MediaUrl_F = string.Empty;
+        }
+
+        public int IDCamera { get; set; }
+        public string MediaUrl_T { get; set; }
+        public string MediaUrl_F { get; set; }
     }
 }

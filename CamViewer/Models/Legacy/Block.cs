@@ -5,9 +5,18 @@ namespace CamViewer.Models.Legacy
 {
     public class Block
     {
+        public Block()
+        {
+            Numbers = string.Empty;
+
+            InternalNumbers = new List<int>();
+            Lanes = new List<Lane>();
+        }
+
         [XmlAttribute("Numbers")]
-        public string Numbers { get; set; } = string.Empty;
-        public List<int> InternalNumbers { get; set; } = new List<int>();
-        public List<Lane> Lanes { get; set; } = new List<Lane>();
+        public string Numbers { get; set; }
+
+        public List<int> InternalNumbers { get; set; }
+        public List<Lane> Lanes { get; set; }
     }
 }

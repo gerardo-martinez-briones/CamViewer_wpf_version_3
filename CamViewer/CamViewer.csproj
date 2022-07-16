@@ -14,6 +14,7 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -24,6 +25,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -33,11 +35,15 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Resources\Camera.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\packages\NLog.5.0.1\lib\net46\NLog.dll</HintPath>
     </Reference>
@@ -46,6 +52,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -70,12 +78,22 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Connected Services\Onvif\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Connected Services\Media\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\General.cs" />
     <Compile Include="Helpers\Log4Cam.cs" />
-    <Compile Include="Models\OnvifCamera.cs" />
-    <Compile Include="Models\Config.cs" />
-    <Compile Include="Models\Device.cs" />
-    <Compile Include="Models\Folder.cs" />
+    <Compile Include="Models\CameraModel.cs" />
+    <Compile Include="Models\ConfigModel.cs" />
+    <Compile Include="Models\DeviceModel.cs" />
+    <Compile Include="Models\GroupModel.cs" />
     <Compile Include="Models\Legacy\Block.cs" />
     <Compile Include="Models\Legacy\ButtonPosition.cs" />
     <Compile Include="Models\Legacy\Camera.cs" />
@@ -98,10 +116,19 @@
     <Compile Include="Models\Legacy\XmlDoc.cs" />
     <Compile Include="Models\Legacy\XmlDocFile.cs" />
     <Compile Include="Models\Legacy\XmlDocFileContent.cs" />
-    <Compile Include="Models\Profile.cs" />
-    <Compile Include="Services\FileLegacy.cs" />
+    <Compile Include="Models\ParameterModel.cs" />
+    <Compile Include="Models\ProfileModel.cs" />
+    <Compile Include="UserControl1.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControl1.Designer.cs">
+      <DependentUpon>UserControl1.cs</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\FolderControl.xaml.cs">
       <DependentUpon>FolderControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\LiveVideoControl.xaml.cs">
+      <DependentUpon>LiveVideoControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ConfigView.xaml.cs">
       <DependentUpon>ConfigView.xaml</DependentUpon>
@@ -124,8 +151,529 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Resource Include="Resources\Images\Parameters.png" />
-    <Resource Include="Resources\Images\File.png" />
+    <Resource Include="Resources\Images\Image_25.png" />
+    <Resource Include="Resources\Images\Image_1.png" />
+    <Resource Include="Resources\Images\Image_11.png" />
+    <Resource Include="Resources\Images\Image_12.png" />
+    <Resource Include="Resources\Images\Image_13.png" />
+    <Resource Include="Resources\Images\Image_14.png" />
+    <Resource Include="Resources\Images\Image_15.png" />
+    <Resource Include="Resources\Images\Image_16.png" />
+    <Resource Include="Resources\Images\Image_17.png" />
+    <Resource Include="Resources\Images\Image_18.png" />
+    <Resource Include="Resources\Images\Image_19.png" />
+    <Resource Include="Resources\Images\Image_2.png" />
+    <Resource Include="Resources\Images\Image_20.png" />
+    <Resource Include="Resources\Images\Image_3.png" />
+    <Resource Include="Resources\Images\Image_4.png" />
+    <Resource Include="Resources\Images\Image_5.png" />
+    <Resource Include="Resources\Fonts\OFL.txt" />
+    <Resource Include="Resources\Fonts\README.txt" />
+    <EmbeddedResource Include="UserControl1.resx">
+      <DependentUpon>UserControl1.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="Connected Services\Media\CamViewer.Media.AudioDecoderConfiguration.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.AudioDecoderConfigurationOptions.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.AudioEncoderConfiguration.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.AudioEncoderConfigurationOptions.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.AudioOutput.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.AudioOutputConfiguration.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.AudioOutputConfigurationOptions.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.AudioSource.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.AudioSourceConfiguration.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.AudioSourceConfigurationOptions.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.Capabilities.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.CreateOSDResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.DeleteOSDResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetAudioDecoderConfigurationsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetAudioEncoderConfigurationsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetAudioOutputConfigurationsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetAudioOutputsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetAudioSourceConfigurationsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetAudioSourcesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetCompatibleAudioDecoderConfigurationsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetCompatibleAudioEncoderConfigurationsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetCompatibleAudioOutputConfigurationsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetCompatibleAudioSourceConfigurationsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetCompatibleMetadataConfigurationsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetCompatibleVideoAnalyticsConfigurationsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetCompatibleVideoEncoderConfigurationsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetCompatibleVideoSourceConfigurationsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetGuaranteedNumberOfVideoEncoderInstancesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetMetadataConfigurationsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetOSDOptionsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetOSDResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetOSDsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetProfilesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetVideoAnalyticsConfigurationsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetVideoEncoderConfigurationsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetVideoSourceConfigurationsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetVideoSourceModesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.GetVideoSourcesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.MediaUri.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.MetadataConfiguration.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.MetadataConfigurationOptions.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.OSDConfiguration.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.OSDConfigurationOptions.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.Profile.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.SetOSDResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.VideoAnalyticsConfiguration.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.VideoEncoderConfiguration.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.VideoEncoderConfigurationOptions.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.VideoSource.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.VideoSourceConfiguration.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.VideoSourceConfigurationOptions.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Media\CamViewer.Media.VideoSourceMode.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\b-2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\Onvif\bf-2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.AddScopesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.BackupFile.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.BinaryData.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.Capabilities.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.Certificate.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.CertificateInformation.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.CertificateStatus.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.CreateCertificateResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.CreateUsersResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.DeleteCertificatesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.DeleteDot1XConfigurationResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.DeleteGeoLocationResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.DeleteUsersResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.DeviceServiceCapabilities.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.DiscoveryMode.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.DNSInformation.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.Dot11AvailableNetworks.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.Dot11Capabilities.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.Dot11Status.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.Dot1XConfiguration.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.DynamicDNSInformation.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetAuthFailureWarningConfigurationResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetAuthFailureWarningOptionsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetCACertificatesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetCapabilitiesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetCertificateInformationResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetCertificatesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetCertificatesStatusResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetDeviceInformationResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetDot11CapabilitiesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetDot1XConfigurationsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetDPAddressesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetEndpointReferenceResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetGeoLocationResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetNetworkInterfacesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetNetworkProtocolsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetPasswordComplexityConfigurationResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetPasswordComplexityOptionsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetPasswordHistoryConfigurationResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetPkcs10RequestResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetRelayOutputsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetScopesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetServicesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetStorageConfigurationsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetSystemBackupResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetSystemUrisResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetSystemUrisResponseExtension.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetUsersResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.GetWsdlUrlResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.HostnameInformation.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.IntRange.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.IPAddressFilter.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.LoadCACertificatesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.LoadCertificatesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.LoadCertificateWithPrivateKeyResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.LocationEntity.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.NetworkGateway.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.NetworkHost.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.NetworkInterface.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.NetworkProtocol.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.NetworkZeroConfiguration.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.NTPInformation.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.RelayOutput.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.RemoteUser.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.RemoveScopesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.RestoreSystemResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.ScanAvailableDot11NetworksResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.Scope.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.Service.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.SetCertificatesStatusResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.SetDNSResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.SetDPAddressesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.SetDynamicDNSResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.SetGeoLocationResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.SetHostnameResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.SetNetworkDefaultGatewayResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.SetNetworkProtocolsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.SetNTPResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.SetScopesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.SetUserResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.StartFirmwareUpgradeResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.StartSystemRestoreResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.StorageConfiguration.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.SupportInformation.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.SystemDateTime.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.SystemLog.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.SystemLogUri.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\CamViewer.Onvif.User.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\Onvif\common.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\Onvif\devicemgmt.wsdl" />
+    <None Include="Connected Services\Onvif\include.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\Onvif\item.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\Onvif\onvif.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\Onvif\t-1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\Onvif\ws-addr.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\Onvif\xml.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\Onvif\xmlmime.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\Media\b-2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\Media\bf-2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\Media\common.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\Media\include.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\Media\item.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\Media\media.wsdl" />
+    <None Include="Connected Services\Media\onvif.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\Media\t-1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\Media\ws-addr.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\Media\xml.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\Media\xmlmime.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Properties\DataSources\System.Xml.XmlElement.datasource" />
+    <Resource Include="Resources\Fonts\Montserrat-Black.ttf" />
+    <Resource Include="Resources\Fonts\Montserrat-BlackItalic.ttf" />
+    <Resource Include="Resources\Fonts\Montserrat-Bold.ttf" />
+    <Resource Include="Resources\Fonts\Montserrat-BoldItalic.ttf" />
+    <Resource Include="Resources\Fonts\Montserrat-ExtraBold.ttf" />
+    <Resource Include="Resources\Fonts\Montserrat-ExtraBoldItalic.ttf" />
+    <Resource Include="Resources\Fonts\Montserrat-ExtraLight.ttf" />
+    <Resource Include="Resources\Fonts\Montserrat-ExtraLightItalic.ttf" />
+    <Resource Include="Resources\Fonts\Montserrat-Italic.ttf" />
+    <Resource Include="Resources\Fonts\Montserrat-Light.ttf" />
+    <Resource Include="Resources\Fonts\Montserrat-LightItalic.ttf" />
+    <Resource Include="Resources\Fonts\Montserrat-Medium.ttf" />
+    <Resource Include="Resources\Fonts\Montserrat-MediumItalic.ttf" />
+    <Resource Include="Resources\Fonts\Montserrat-Regular.ttf" />
+    <Resource Include="Resources\Fonts\Montserrat-SemiBold.ttf" />
+    <Resource Include="Resources\Fonts\Montserrat-SemiBoldItalic.ttf" />
+    <Resource Include="Resources\Fonts\Montserrat-Thin.ttf" />
+    <Resource Include="Resources\Fonts\Montserrat-ThinItalic.ttf" />
+    <Resource Include="Resources\Fonts\Montserrat-VariableFont_wght.ttf" />
     <None Include="Settings\Settings.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -141,27 +689,27 @@
     <None Include="Settings\Settings_Yangshan.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Settings\GlobalConfig.json">
+    <None Include="Settings\MainConfig.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Resource Include="Resources\Images\Camera.png" />
-    <Resource Include="Resources\Images\CameraItem.png" />
-    <Resource Include="Resources\Images\GlobalSettings.png" />
-    <Resource Include="Resources\Images\Profile.png" />
-    <Resource Include="Resources\Images\ProfileItem.png" />
-    <Resource Include="Resources\Images\Cameras.png" />
-    <Resource Include="Resources\Images\Info.png" />
-    <Resource Include="Resources\Images\Device.png" />
     <Resource Include="Resources\Camera.ico" />
     <Resource Include="Resources\Fonts\LICENSE.txt" />
-    <Resource Include="Resources\Images\Close.png" />
-    <Resource Include="Resources\Images\Folder.png" />
-    <Resource Include="Resources\Images\Onvif.png" />
-    <Resource Include="Resources\Images\Settings.png" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="Connected Services\Onvif\configuration91.svcinfo" />
+    <None Include="Connected Services\Onvif\configuration.svcinfo" />
+    <None Include="Connected Services\Onvif\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Connected Services\Media\configuration91.svcinfo" />
+    <None Include="Connected Services\Media\configuration.svcinfo" />
+    <None Include="Connected Services\Media\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
     <Content Include="MediaPlayerLib\axvlc.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -203,6 +751,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UserControls\LiveVideoControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\ConfigView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -211,6 +763,13 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Connected Services\Onvif\" />
+    <WCFMetadataStorage Include="Connected Services\Media\" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="AxAXVLC">
@@ -231,6 +790,14 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\OnvifCamera\CtrlOnvifCamera.csproj">
+      <Project>{49cd07e9-3c2f-46d7-8a41-07d888bd0e19}</Project>
+      <Name>CtrlOnvifCamera</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

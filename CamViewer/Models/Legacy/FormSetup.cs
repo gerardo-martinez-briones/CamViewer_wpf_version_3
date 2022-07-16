@@ -5,21 +5,44 @@ namespace CamViewer.Models.Legacy
 {
     public class FormSetup
     {
+        public FormSetup()
+        {
+            IDForm = 0;
+            ShowPanel = false;
+            Border = 0;
+            BorderCamera = 0;
+            Interval = 0;
+            OnTop = false;
+            Exit = false;
+            BtnEnb = false;
+            PresetEnb = false;
+            SetPresEnb = false;
+            LaneDisplayType = false;
+            AutoHome= false;
+
+            Location = new Location();
+            Dimension = new Dimension();
+            Setups = new List<Setup>();
+        }
+
         [XmlAttribute("ID")]
-        public int IDForm { get; set; } = 0;
-        public Location Location { get; set; } = new Location();
-        public Dimension Dimension { get; set; } = new Dimension();
-        public bool ShowPanel { get; set; } = false;
-        public int Border { get; set; } = 0;
-        public int BorderCamera { get; set; } = 0;
-        public int Interval { get; set; } = 0;
-        public bool OnTop { get; set; } = false;
-        public bool Exit { get; set; } = false;
-        public bool BtnEnb { get; set; } = false;
-        public bool PresetEnb { get; set; } = false;
-        public bool SetPresEnb { get; set; } = false;
-        public bool LaneDisplayType { get; set; } = false;
-        public bool AutoHome { get; set; } = false;
-        public List<Setup> Setups { get; set; } = new List<Setup>();
+        public int IDForm { get; set; }
+
+        public Location Location { get; set; }
+        public Dimension Dimension { get; set; }
+
+        public bool ShowPanel { get; set; }
+        public int Border { get; set; }
+        public int BorderCamera { get; set; }
+        public int Interval { get; set; }
+        public bool OnTop { get; set; }
+        public bool Exit { get; set; }
+        public bool BtnEnb { get; set; }
+        public bool PresetEnb { get; set; }
+        public bool SetPresEnb { get; set; }
+        public bool LaneDisplayType { get; set; }
+        public bool AutoHome { get; set; }
+
+        public List<Setup> Setups { get; set; }
     }
 }

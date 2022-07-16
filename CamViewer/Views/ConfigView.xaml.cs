@@ -1,11 +1,8 @@
-﻿using CamViewer.Helpers;
-using CamViewer.Models;
-using CamViewer.Models.Legacy;
-using CamViewer.Services;
+﻿using CamViewer.Models;
 using Microsoft.Win32;
+using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using static CamViewer.Helpers.General;
@@ -14,217 +11,121 @@ namespace CamViewer.Views
 {
     public partial class ConfigView : Window
     {
-        private TreeViewItem _rootNode;
-        private TreeViewItem _onvifNode;
-        private TreeViewItem _settingsNode;
-        private TreeViewItem _selectedNode;
-        private Config _config;
+        private ConfigModel _mainConfig;
+        private TreeViewItem _viewItemRootHeader;
+        private TreeViewItem _viewItemOnvifHeader;
+        private TreeViewItem _viewItemSettingsHeader;
+        private TreeViewItem _viewItemSelected;
 
         public ConfigView()
         {
             InitializeComponent();
 
-            _rootNode = new TreeViewItem();
-            _onvifNode = new TreeViewItem();
-            _settingsNode = new TreeViewItem();
-            _config = new Config();
+            _mainConfig = new ConfigModel();
+            _viewItemRootHeader = new TreeViewItem();
+            _viewItemOnvifHeader = new TreeViewItem();
+            _viewItemSettingsHeader = new TreeViewItem();
+
+            InitializeTreeView();
+            LoadMainConfiguration();
+            LoadTreeView();
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            LoadData();
-            BuildTreeView();
-        }
-        private void TvwMainConfig_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            _selectedNode = (TreeViewItem)((TreeView)sender).SelectedItem;
-        }
-
-        private void LoadData()
-        {
-            _config.Folders.Add(new Folder("Fence"));
-            _config.Folders.Add(new Folder("Spreader"));
-            _config.Folders.Add(new Folder("Trolley PTZ"));
-
-            _config.Folders[0].Devices.Add(new Device("root", "Pass123!", "169.254.113.207"));
-            _config.Folders[0].Devices.Add(new Device("root", "Pass123!", "169.254.195.178"));
-            _config.Folders[0].Devices.Add(new Device("root", "Pass123!", "169.254.113.106"));
-
-            _config.Folders[0].Devices[0].Profiles.Add(new Profile("profile_1 h264"));
-            _config.Folders[0].Devices[0].Profiles.Add(new Profile("profile_1 jpeg"));
-
-            _config.Folders[0].Devices[1].Profiles.Add(new Profile("User Profile01"));
-            _config.Folders[0].Devices[1].Profiles.Add(new Profile("User Profile02"));
-            _config.Folders[0].Devices[1].Profiles.Add(new Profile("User Profile03"));
-            _config.Folders[0].Devices[1].Profiles.Add(new Profile("User Profile04"));
-            _config.Folders[0].Devices[1].Profiles.Add(new Profile("User Profile05"));
-            _config.Folders[0].Devices[1].Profiles.Add(new Profile("User Profile06"));
-            _config.Folders[0].Devices[1].Profiles.Add(new Profile("User Profile07"));
-            _config.Folders[0].Devices[1].Profiles.Add(new Profile("User Profile08"));
-
-            _config.Folders[0].Devices[1].Cameras.Add(new OnvifCamera("rtsp://root:Pass123!@169.254.195.178:554/live?pf=11&pt=tcp"));
-            _config.Folders[0].Devices[1].Cameras.Add(new OnvifCamera("rtsp://root:Pass123!@169.254.195.178:554/live?pf=17&pt=tcp"));
-
-            _config.Devices.Add(new Device("root", "Pass123!", "192.168.87.100"));
-            _config.Devices.Add(new Device("root", "Pass123!", "192.168.87.150"));
-            _config.Devices.Add(new Device("root", "Pass123!", "192.168.87.170"));
-            _config.Devices.Add(new Device("root", "Pass123!", "192.168.87.190"));
-        }
-        private void BuildTreeView()
+        private void InitializeTreeView()
         {
             try
             {
-                _rootNode = BuildTreeViewItem(NodeTypeEnum.ROOT_NODE, Guid.NewGuid().ToString(), General.GetResource("StrRootNodeCaption").ToString(), (Image)General.GetResource("ImgRootNode"));
-                _onvifNode = BuildTreeViewItem(NodeTypeEnum.ONVIF_NODE, Guid.NewGuid().ToString(), General.GetResource("StrOnvifNodeCaption").ToString(), (Image)General.GetResource("ImgOnvifNode"));
-                _settingsNode = BuildTreeViewItem(NodeTypeEnum.SETTINGS_NODE, Guid.NewGuid().ToString(), General.GetResource("StrSettingsNodeCaption").ToString(), (Image)General.GetResource("ImgSettingsNode"));
+                _viewItemRootHeader = CreateNode((int)NodeTypeEnum.Root_Header, Guid.NewGuid().ToString());
+                _viewItemOnvifHeader = CreateNode((int)NodeTypeEnum.Onvif_Header, Guid.NewGuid().ToString());
+                _viewItemSettingsHeader = CreateNode((int)NodeTypeEnum.Settings_Header, Guid.NewGuid().ToString());
 
-                // *** dynamics branchs folders
-                foreach (Folder itemFolder in _config.Folders)
-                {
-                    TreeViewItem folderNode = BuildTreeViewItem((NodeTypeEnum)itemFolder.Type, itemFolder.Id, itemFolder.Name, (Image)General.GetResource("ImgFolderNode"));
+                TreeViewItem viewItemOnvifParametersHeader = CreateNode((int)NodeTypeEnum.Onvif_Parameters_Header, Guid.NewGuid().ToString());
+                TreeViewItem viewItemOnvifParametersInterval = CreateNode((int)NodeTypeEnum.Onvif_Parameters_Interval, Guid.NewGuid().ToString(), _mainConfig.Parameters.IntervalDiscovery.ToString());
 
-                    List<TreeViewItem> devicesFromFolder = BuildNodeDevices(itemFolder.Devices);
-                    foreach (TreeViewItem itemView in devicesFromFolder)
-                        folderNode.Items.Add(itemView);
+                viewItemOnvifParametersHeader.Items.Add(viewItemOnvifParametersInterval);
+                _viewItemOnvifHeader.Items.Add(viewItemOnvifParametersHeader);
 
-                    _onvifNode.Items.Add(folderNode);
-                }
+                _viewItemRootHeader.Items.Add(_viewItemOnvifHeader);
+                _viewItemRootHeader.Items.Add(_viewItemSettingsHeader);
 
-                // *** dynamics branchs devices
-                List<TreeViewItem> devices = BuildNodeDevices(_config.Devices);
-                foreach (TreeViewItem itemView in devices)
-                    _onvifNode.Items.Add(itemView);
-
-                // *** dynamics branchs settings
-                foreach (Settings itemSettings in _config.Settings)
-                {
-
-                }
-
-                _rootNode.Items.Add(_onvifNode);
-                _rootNode.Items.Add(_settingsNode);
-
-                tvwMainConfig.Items.Add(_rootNode);
+                TvwMainConfig.Items.Add(_viewItemRootHeader);                
             }
             catch (Exception ex)
             {
                 throw ex;
             }
         }
-        private List<TreeViewItem> BuildNodeDevices(List<Device> devices)
-        {
-            List<TreeViewItem> result;
 
+        private void LoadMainConfiguration()
+        {
             try
             {
-                result = new List<TreeViewItem>();
+                _mainConfig.Groups.Add(new GroupModel("Fence"));
+                _mainConfig.Groups.Add(new GroupModel("Spreader"));
+                _mainConfig.Groups.Add(new GroupModel("Trolley PTZ"));
 
-                foreach (Device itemDevice in devices)
+                _mainConfig.Groups[0].Devices.Add(new DeviceModel("root", "Pass123!", "ASC01LTPTZ1"));
+                _mainConfig.Groups[0].Devices.Add(new DeviceModel("root", "Pass123!", "ASC01LVSPR"));
+
+                _mainConfig.Groups[0].Devices[0].Profiles.Add(new ProfileModel("profile_1 h264"));
+                _mainConfig.Groups[0].Devices[0].Profiles.Add(new ProfileModel("profile_1 jpeg"));
+
+                _mainConfig.Groups[0].Devices[1].Profiles.Add(new ProfileModel("User Profile01"));
+                _mainConfig.Groups[0].Devices[1].Profiles.Add(new ProfileModel("User Profile02"));
+                _mainConfig.Groups[0].Devices[1].Profiles.Add(new ProfileModel("User Profile03"));
+                _mainConfig.Groups[0].Devices[1].Profiles.Add(new ProfileModel("User Profile04"));
+                _mainConfig.Groups[0].Devices[1].Profiles.Add(new ProfileModel("User Profile05"));
+                _mainConfig.Groups[0].Devices[1].Profiles.Add(new ProfileModel("User Profile06"));
+                _mainConfig.Groups[0].Devices[1].Profiles.Add(new ProfileModel("User Profile07"));
+                _mainConfig.Groups[0].Devices[1].Profiles.Add(new ProfileModel("User Profile08"));
+
+                _mainConfig.Groups[0].Devices[1].Cameras.Add(new CameraModel("rtsp://root:Pass123!@169.254.195.178:554/live?pf=11&pt=tcp"));
+                _mainConfig.Groups[0].Devices[1].Cameras.Add(new CameraModel("rtsp://root:Pass123!@169.254.195.178:554/live?pf=17&pt=tcp"));
+
+                _mainConfig.Devices.Add(new DeviceModel("root", "Pass123!", "192.168.87.100"));
+                _mainConfig.Devices.Add(new DeviceModel("root", "Pass123!", "192.168.87.150"));
+                _mainConfig.Devices.Add(new DeviceModel("root", "Pass123!", "192.168.87.170"));
+                _mainConfig.Devices.Add(new DeviceModel("root", "Pass123!", "192.168.87.190"));
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        private void LoadTreeView()
+        {
+            try
+            {
+                foreach (GroupModel itemGroup in _mainConfig.Groups)
                 {
-                    TreeViewItem deviceNode = BuildTreeViewItem((NodeTypeEnum)itemDevice.Type, itemDevice.Id, itemDevice.HostName, (Image)General.GetResource("ImgDeviceNode"));
-                    TreeViewItem infoHeaderNode = BuildTreeViewItem(NodeTypeEnum.INFO_NODE, itemDevice.Id, General.GetResource("StrInfoHeaderNodeCaption").ToString(), (Image)General.GetResource("ImgInfoNode"));
-                    TreeViewItem profileHeaderNode = BuildTreeViewItem(NodeTypeEnum.PROFILE_NODE, itemDevice.Id, General.GetResource("StrProfileHeaderNodeCaption").ToString(), (Image)General.GetResource("ImgProfileNode"));
-                    TreeViewItem cameraHeaderNode = BuildTreeViewItem(NodeTypeEnum.CAMERA_NODE, itemDevice.Id, General.GetResource("StrCameraHeaderNodeCaption").ToString(), (Image)General.GetResource("ImgCameraNode"));
+                    TreeViewItem _viewItemGroup = CreateNode(itemGroup.Type, itemGroup.Id, itemGroup.Name);
 
-                    if (!string.IsNullOrWhiteSpace(itemDevice.InfoName))
+                    foreach (DeviceModel itemDevice in itemGroup.Devices)
                     {
-                        TreeViewItem infoNameNode = BuildTreeViewItem(NodeTypeEnum.NONE, itemDevice.Id, General.GetResource("StrInfoNameNodeCaption").ToString());
-                        infoHeaderNode.Items.Add(infoNameNode);
+                        TreeViewItem _viewItemDevice = CreateDeviceNode(itemDevice);
+                        _viewItemGroup.Items.Add(_viewItemDevice);
                     }
 
-                    if (!string.IsNullOrWhiteSpace(itemDevice.Manufacturer))
-                    {
-                        TreeViewItem infoManufacturerNode = BuildTreeViewItem(NodeTypeEnum.NONE, itemDevice.Id, General.GetResource("StrInfoManufacturerNodeCaption").ToString());
-                        infoHeaderNode.Items.Add(infoManufacturerNode);
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(itemDevice.Firmware))
-                    {
-                        TreeViewItem infoFirmwareNode = BuildTreeViewItem(NodeTypeEnum.NONE, itemDevice.Id, General.GetResource("StrInfoFirmwareNodeCaption").ToString());
-                        infoHeaderNode.Items.Add(infoFirmwareNode);
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(itemDevice.OnvifVersion))
-                    {
-                        TreeViewItem infoOnvifVersionNode = BuildTreeViewItem(NodeTypeEnum.NONE, itemDevice.Id, General.GetResource("StrInfoOnvifVersionNodeCaption").ToString());
-                        infoHeaderNode.Items.Add(infoOnvifVersionNode);
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(itemDevice.Uri))
-                    {
-                        TreeViewItem infoUriNode = BuildTreeViewItem(NodeTypeEnum.NONE, itemDevice.Id, General.GetResource("StrInfoUriNodeCaption").ToString());
-                        infoHeaderNode.Items.Add(infoUriNode);
-                    }
-
-                    foreach (Profile itemProfile in itemDevice.Profiles)
-                    {
-                        TreeViewItem profileTokenNode = BuildTreeViewItem((NodeTypeEnum)itemProfile.Type, itemProfile.Id, itemProfile.Token, (Image)General.GetResource("ImgProfileTokenNode"));
-                        profileHeaderNode.Items.Add(profileTokenNode);
-                    }
-
-                    foreach (OnvifCamera itemCamera in itemDevice.Cameras)
-                    {
-                        TreeViewItem cameraItemNode = BuildTreeViewItem((NodeTypeEnum)itemCamera.Type, itemCamera.Id, itemCamera.MediaUrl, (Image)General.GetResource("ImgCameraItemNode"));
-                        cameraHeaderNode.Items.Add(cameraItemNode);
-                    }
-
-                    deviceNode.Items.Add(infoHeaderNode);
-                    deviceNode.Items.Add(profileHeaderNode);
-                    deviceNode.Items.Add(cameraHeaderNode);
-
-                    result.Add(deviceNode);
+                    _viewItemOnvifHeader.Items.Add(_viewItemGroup);
                 }
             }
             catch (Exception ex)
             {
                 throw ex;
             }
-
-            return result;
         }
-        private void BuildNodeLegacy(Settings settings, TreeViewItem node)
-        {
-            try
-            {
-                TreeViewItem xmlFileNode = BuildTreeViewItem((NodeTypeEnum)settings.Type, settings.Id, settings.Id, (Image)General.GetResource("ImgXmlFileNode"));
-                TreeViewItem parametersNode = BuildTreeViewItem(NodeTypeEnum.NONE, settings.Id, General.GetResource("StrParametersNodeCaption").ToString(), (Image)General.GetResource("ImgParametersNode"));
-                TreeViewItem settingsPathNode = BuildTreeViewItem(NodeTypeEnum.NONE, settings.Id, General.GetResource("StrSettingsPathNodeCaption").ToString() + " " + settings.SettingsPath);
-                TreeViewItem prefixCraneNameNode = BuildTreeViewItem(NodeTypeEnum.NONE, settings.Id, General.GetResource("StrPrefixCraneNameNodeCaption").ToString() + " " + settings.PrefixCraneName);
-                TreeViewItem craneNameTemplateNode = BuildTreeViewItem(NodeTypeEnum.NONE, settings.Id, General.GetResource("StrCraneNameTemplateNodeCaption").ToString() + " " + settings.CraneNameTemplate);
-                TreeViewItem blockNameTemplateNode = BuildTreeViewItem(NodeTypeEnum.NONE, settings.Id, General.GetResource("StrBlockNameTemplateNodeCaption").ToString() + " " + settings.BlockNameTemplate);
-                TreeViewItem projectNode = BuildTreeViewItem(NodeTypeEnum.NONE, settings.Id, General.GetResource("StrProjectNodeCaption").ToString() + " " + settings.Project);
-                TreeViewItem rosIDNode = BuildTreeViewItem(NodeTypeEnum.NONE, settings.Id, General.GetResource("StrRosIDNodeCaption").ToString() + " " + settings.RosID);
-                TreeViewItem rosIniPathNode = BuildTreeViewItem(NodeTypeEnum.NONE, settings.Id, General.GetResource("StrROSIniPathNodeCaption").ToString() + " " + settings.ROSIniPath);
 
-                parametersNode.Items.Add(settingsPathNode);
-                parametersNode.Items.Add(prefixCraneNameNode);
-                parametersNode.Items.Add(craneNameTemplateNode);
-                parametersNode.Items.Add(blockNameTemplateNode);
-                parametersNode.Items.Add(projectNode);
-                parametersNode.Items.Add(rosIDNode);
-                parametersNode.Items.Add(rosIniPathNode);
-
-                xmlFileNode.Items.Add(parametersNode);
-                node.Items.Add(xmlFileNode);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-        private TreeViewItem BuildTreeViewItem(NodeTypeEnum type, string id, string caption, Image icon = null)
+        private TreeViewItem CreateNode(int type, string id, string caption = "")
         {
-            TreeViewItem result;
+            TreeViewItem result = new TreeViewItem();
 
             try
             {
-                result = new TreeViewItem();
-
-                result.IsExpanded = (type == NodeTypeEnum.ROOT_NODE || type == NodeTypeEnum.ONVIF_NODE || type == NodeTypeEnum.SETTINGS_NODE) ? true : false;
-                result.Header = BuildHeaderItem(caption, icon);
-                result.ContextMenu = BuildContextMenu(type);
+                result.Header = CreateHeader(type, caption);
+                result.ContextMenu = CreateContextMenu((NodeTypeEnum)type);
                 result.Uid = id;
-                result.Tag = type;
+                result.Tag = (int)type;
             }
             catch (Exception ex)
             {
@@ -233,33 +134,99 @@ namespace CamViewer.Views
 
             return result;
         }
-        private StackPanel BuildHeaderItem(string caption, Image icon = null)
+
+        private TreeViewItem CreateDeviceNode(DeviceModel source)
         {
-            StackPanel result;
-            Image image;
-            TextBlock text;
-            Thickness margin;
+            TreeViewItem result = new TreeViewItem();
 
             try
             {
-                result = new StackPanel();
-                image = new Image();
-                text = new TextBlock();
-                margin = new Thickness(5, 0, 0, 0);
+                result = CreateNode(source.Type, source.Id, source.HostName);
 
+                TreeViewItem viewItemInfoHeader = CreateNode((int)NodeTypeEnum.Info_Header, source.Id);
+                TreeViewItem viewItemProfileHeader = CreateNode((int)NodeTypeEnum.Profile_Header, source.Id);
+                TreeViewItem viewItemCameraHeader = CreateNode((int)NodeTypeEnum.Camera_Header, source.Id);
+
+                TreeViewItem viewItemInfoModel = CreateNode((int)NodeTypeEnum.Info_Model, source.Id, source.Model);
+                TreeViewItem viewItemInfoFirmwareVersion = CreateNode((int)NodeTypeEnum.Info_FirmwareVersion, source.Id, source.FirmwareVersion);
+                TreeViewItem viewItemInfoSerialNumber = CreateNode((int)NodeTypeEnum.Info_SerialNumber, source.Id, source.SerialNumber);
+                TreeViewItem viewItemInfoHardwareId = CreateNode((int)NodeTypeEnum.Info_HardwareId, source.Id, source.HardwareId);
+                TreeViewItem viewItemInfoUri = CreateNode((int)NodeTypeEnum.Info_Uri, source.Id, source.Uri);
+
+                if (!string.IsNullOrEmpty(source.Model))
+                    viewItemInfoHeader.Items.Add(viewItemInfoModel);
+
+                if (!string.IsNullOrEmpty(source.FirmwareVersion))
+                    viewItemInfoHeader.Items.Add(viewItemInfoFirmwareVersion);
+
+                if (!string.IsNullOrEmpty(source.SerialNumber))
+                    viewItemInfoHeader.Items.Add(viewItemInfoSerialNumber);
+
+                if (!string.IsNullOrEmpty(source.HardwareId))
+                    viewItemInfoHeader.Items.Add(viewItemInfoHardwareId);
+
+                if (!string.IsNullOrEmpty(source.Uri))
+                    viewItemInfoHeader.Items.Add(viewItemInfoUri);
+
+                foreach (ProfileModel itemProfile in source.Profiles)
+                {
+                    TreeViewItem viewItemProfile = CreateNode(itemProfile.Type, itemProfile.Id, itemProfile.Token);
+                    viewItemProfileHeader.Items.Add(viewItemProfile);
+                }
+
+                foreach (CameraModel itemCamera in source.Cameras)
+                {
+                    TreeViewItem viewItemProfile = CreateNode(itemCamera.Type, itemCamera.Id, itemCamera.Url);
+                    viewItemCameraHeader.Items.Add(viewItemProfile);
+                }
+
+                result.Items.Add(viewItemInfoHeader);
+                result.Items.Add(viewItemProfileHeader);
+                result.Items.Add(viewItemCameraHeader);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return result;
+        }
+
+        private StackPanel CreateHeader(int type, string caption)
+        {
+            StackPanel result = new StackPanel();
+            TextBlock textblock = new TextBlock();
+            Image image = null;
+            Thickness margin = new Thickness(5, 0, 0, 0);
+
+            try
+            {
                 result.Orientation = Orientation.Horizontal;
 
-                text.Text = caption;
-                text.Margin = margin;
-                text.VerticalAlignment = VerticalAlignment.Center;
+                textblock.Text = caption;
+                textblock.VerticalAlignment = VerticalAlignment.Center;
+                textblock.Margin = margin;
 
-                if (icon != null)
+                if (App.Current.Resources.Contains("Caption_" + type.ToString()))
                 {
-                    image.Source = icon.Source;
-                    result.Children.Add(image);
+                    textblock.Text = App.Current.FindResource("Caption_" + type.ToString()).ToString();
+                    textblock.Text += " " + caption;
                 }
 
-                result.Children.Add(text);
+                if (App.Current.Resources.Contains("Image_" + type.ToString()))
+                {
+                    Image imageTempo = (Image)App.Current.FindResource("Image_" + type.ToString());
+
+                    if (imageTempo != null)
+                    {
+                        image = new Image();
+                        image.Source = imageTempo.Source;
+
+                        result.Children.Add(image);
+                    }
+                }
+
+                result.Children.Add(textblock);
             }
             catch (Exception ex)
             {
@@ -268,93 +235,71 @@ namespace CamViewer.Views
 
             return result;
         }
-        private ContextMenu BuildContextMenu(NodeTypeEnum type)
+
+        private ContextMenu CreateContextMenu(NodeTypeEnum type)
         {
-            ContextMenu result;
+            ContextMenu result = new ContextMenu();
 
             try
             {
-                result = new ContextMenu();
-
                 switch (type)
                 {
-                    case NodeTypeEnum.ROOT_NODE:
-                        result.Items.Add(BuildMenuItem("Import...", ActionEnum.IMPORT_FILE_ACTION));
-                        result.Items.Add(BuildMenuItem("Export...", ActionEnum.EXPORT_FILE_ACTION));
-                        result.Items.Add(BuildMenuItem("Save", ActionEnum.SAVE_ACTION));
+                    case NodeTypeEnum.Other:
                         break;
-                    case NodeTypeEnum.ONVIF_NODE:
-                        result.Items.Add(BuildMenuItem("New Folder...", ActionEnum.NEW_FOLDER_ACTION));
-                        result.Items.Add(BuildMenuItem("New Devices...", ActionEnum.NEW_DEVICES_ACTION));
+                    case NodeTypeEnum.Root_Header:
+                        result.Items.Add(CreateMenuItem((int)ActionEnum.Import_Global_Config));
+                        result.Items.Add(CreateMenuItem((int)ActionEnum.Export_Global_Config));
+                        result.Items.Add(CreateMenuItem((int)ActionEnum.Save_Global_Config));
                         break;
-                    case NodeTypeEnum.SETTINGS_NODE:
-                        result.Items.Add(BuildMenuItem("Import Legacy...", ActionEnum.IMPORT_FILE_LEGACY_ACTION));
+                    case NodeTypeEnum.Onvif_Header:
                         break;
-                    case NodeTypeEnum.FOLDER_NODE:
+                    case NodeTypeEnum.Folder_Item:
                         break;
-                    case NodeTypeEnum.DEVICE_NODE:
+                    case NodeTypeEnum.Device_Item:
                         break;
-                    case NodeTypeEnum.INFO_NODE:
+                    case NodeTypeEnum.Info_Header:
                         break;
+                    case NodeTypeEnum.Info_Model:
                         break;
-                    case NodeTypeEnum.PROFILE_NODE:
+                    case NodeTypeEnum.Info_FirmwareVersion:
                         break;
-                    case NodeTypeEnum.PROFILE_TOKEN_NODE:
+                    case NodeTypeEnum.Info_SerialNumber:
                         break;
-                    case NodeTypeEnum.CAMERA_NODE:
+                    case NodeTypeEnum.Info_HardwareId:
                         break;
-                    case NodeTypeEnum.CAMERA_ITEM_NODE:
+                    case NodeTypeEnum.Info_Uri:
                         break;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
-            return result;
-        }
-        private MenuItem BuildMenuItem(string caption, ActionEnum actionName)
-        {
-            MenuItem result;
-
-            try
-            {
-                result = new MenuItem();
-
-                result.Header = caption;
-                result.Click += OnMenuItem_Click;
-                result.Tag = actionName;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
-            return result;
-        }
-        private void OnMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            ActionEnum actionName;
-
-            try
-            {
-                actionName = (ActionEnum)((MenuItem)sender).Tag;
-
-                switch (actionName)
-                {
-                    case ActionEnum.IMPORT_FILE_ACTION:
+                    case NodeTypeEnum.Profile_Header:
                         break;
-                    case ActionEnum.EXPORT_FILE_ACTION:
+                    case NodeTypeEnum.Profile_Token:
                         break;
-                    case ActionEnum.SAVE_ACTION:
+                    case NodeTypeEnum.Camera_Header:
                         break;
-                    case ActionEnum.NEW_FOLDER_ACTION:
+                    case NodeTypeEnum.Camera_Item:
                         break;
-                    case ActionEnum.NEW_DEVICES_ACTION:
+                    case NodeTypeEnum.Settings_Header:
                         break;
-                    case ActionEnum.IMPORT_FILE_LEGACY_ACTION:
-                        ImportFileLegacy();
+                    case NodeTypeEnum.Settings_File_Name:
+                        break;
+                    case NodeTypeEnum.Settings_Parameters_Header:
+                        break;
+                    case NodeTypeEnum.Settings_Blocks_Header:
+                        break;
+                    case NodeTypeEnum.Settings_Credentials_Header:
+                        break;
+                    case NodeTypeEnum.Settings_CameraTypes_Header:
+                        break;
+                    case NodeTypeEnum.Settings_Presets_Header:
+                        break;
+                    case NodeTypeEnum.Settings_CimplicityPoints_Header:
+                        break;
+                    case NodeTypeEnum.Settings_Forms_Header:
+                        break;
+                    case NodeTypeEnum.Settings_FormsRemote_Header:
+                        break;
+                    case NodeTypeEnum.Onvif_Parameters_Header:
+                        break;
+                    case NodeTypeEnum.Onvif_Parameters_Interval:
                         break;
                     default:
                         break;
@@ -362,36 +307,103 @@ namespace CamViewer.Views
             }
             catch (Exception ex)
             {
-                Log4Cam.ErrorManager(ex);
+                throw ex;
             }
+
+            return result;
         }
-        private void ImportFileLegacy()
+
+        private MenuItem CreateMenuItem(int action)
         {
-            Settings configLegacy;
-            OpenFileDialog openDialog;
-            FileLegacy fileLegacy;
-            string pathFileName = string.Empty;
+            MenuItem result = new MenuItem();
 
             try
             {
-                openDialog = new OpenFileDialog();
-                fileLegacy = new FileLegacy();
+                if (App.Current.Resources.Contains("ActionName_" + action.ToString()))
+                    result.Header = App.Current.FindResource("ActionName_" + action.ToString()).ToString();
 
-                openDialog.Filter = "Legacy Files (.xml)|*.xml";
+                result.Tag = (ActionEnum)action;
+                result.Click += OnMenuItem_Click;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
 
-                if ((bool)openDialog.ShowDialog())
-                    pathFileName = openDialog.FileName;
+            return result;
+        }
 
-                if (!string.IsNullOrEmpty(pathFileName))
+        private void TvwMainConfig_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            TreeView treeView = (TreeView)sender;
+            TreeViewItem viewItem = (TreeViewItem)treeView.SelectedItem;
+
+            if (viewItem == null)
+            {
+                e.Handled = true;
+                return;
+            }
+                
+            if (viewItem.ContextMenu.Items.Count == 0)
+                e.Handled = true;
+            else
+            {
+                _viewItemSelected = viewItem;
+
+                if ((NodeTypeEnum)viewItem.Tag == NodeTypeEnum.Root_Header)
                 {
-                    configLegacy = fileLegacy.LoadLegacyConfig(pathFileName);
-
-                    if (configLegacy != null)
+                    foreach (MenuItem itemMenu in viewItem.ContextMenu.Items)
                     {
-                        configLegacy.Id = openDialog.SafeFileName.Replace(".xml","").ToUpper();
-                        BuildNodeLegacy(configLegacy, _selectedNode);
-                    }                        
-                }                    
+                        if ((ActionEnum)itemMenu.Tag == ActionEnum.Export_Global_Config)
+                        {
+                            itemMenu.IsEnabled = (_mainConfig.Devices.Count > 0 ||
+                                _mainConfig.Groups.Count > 0 || _mainConfig.Settings.Count > 0);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void OnMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem menuItem;
+
+            try
+            {
+                menuItem = (MenuItem)sender;
+
+                ActionEnum action = (ActionEnum)menuItem.Tag;
+
+                switch (action)
+                {
+                    case ActionEnum.Import_Global_Config:
+                        break;
+                    case ActionEnum.Export_Global_Config:
+                        ExportGlobalConfig();
+                        break;
+                    case ActionEnum.Save_Global_Config:
+                        break;
+                    case ActionEnum.Enable_Mode_Discovery:
+                        break;
+                    case ActionEnum.New_Folder:
+                        break;
+                    case ActionEnum.Edit_Folder:
+                        break;
+                    case ActionEnum.Delete_Folder:
+                        break;
+                    case ActionEnum.New_Device:
+                        break;
+                    case ActionEnum.Edit_Device:
+                        break;
+                    case ActionEnum.Delete_Device:
+                        break;
+                    case ActionEnum.Get_Onvif_Info:
+                        break;
+                    case ActionEnum.Import_File:
+                        break;
+                    default:
+                        break;
+                }
             }
             catch (Exception ex)
             {
@@ -399,9 +411,41 @@ namespace CamViewer.Views
             }
             finally
             {
-                openDialog = null;
-                fileLegacy = null;
+                menuItem = null;
             }
-        }        
+        }
+
+        private void ExportGlobalConfig()
+        {
+            SaveFileDialog saveDialog = new SaveFileDialog();
+            JsonSerializer jsonSerializer = new JsonSerializer();
+            string fileNamePath = string.Empty;
+
+            try
+            {
+                saveDialog.DefaultExt = "json";
+                saveDialog.Filter = "json files (*.json)|*.json|Json files (*.json)|*.json";
+
+                if (saveDialog.ShowDialog() == true)
+                {
+                    fileNamePath = saveDialog.FileName;
+
+                    using (StreamWriter sw = new StreamWriter(@fileNamePath))
+                    using (JsonWriter writer = new JsonTextWriter(sw))
+                    {
+                        jsonSerializer.Serialize(writer, _mainConfig);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                saveDialog = null;
+                jsonSerializer = null;
+            }
+        }
     }
 }

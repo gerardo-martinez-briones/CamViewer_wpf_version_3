@@ -2,9 +2,17 @@
 {
     public class CameraCache
     {
-        public int IDCamera { get; set; } = 0;
-        public string CameraName { get; set; } = string.Empty;
-        public string MediaUrl { get; set; } = string.Empty;
-        public string Tag { get; set; } = string.Empty;
+        public CameraCache()
+        {
+            IDCamera = 0;
+            CameraName = string.Empty;
+            MediaUrl = string.Empty;
+            Tag = string.Empty;
+        }
+
+        public int IDCamera { get; set; }
+        public string CameraName { get; set; }
+        public string MediaUrl { get; set; }
+        public string Tag { get; set; }
     }
 }
